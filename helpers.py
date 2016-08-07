@@ -1,15 +1,15 @@
-from subprocess import call
+from subprocess import call,check_call
 import os
 import platform
 import re
 import tempfile
+import sys
 
 ENVIRON = os.environ
 if platform.system() != 'Windows':
     ENVIRON['PATH'] += ':/usr/local/bin'
 
 DIGRAPH_START = re.compile('.*(digraph([ \t\n\r]+[a-zA-Z\200-\377_][a-zA-Z\200-\3770-9_]*[ \t\n\r]*{|[ \t\n\r]*{).*)', re.DOTALL | re.IGNORECASE)
-
 
 def surroundingGraphviz(data, cursor):
     '''
@@ -39,19 +39,33 @@ def surroundingGraphviz(data, cursor):
     code = code_before + code_after
     return code
 
+def has_dot_installed():
+    if check_call(['dot','-?'], env=ENVIRON)!=0:
+        raise ValueError("Graphviz is not installed, please add it to your path and restart sublime")
 
 def graphvizPDF(code):
     '''
     Convert graphviz code to a PDF.
     '''
+    tmp_folder_path = tempfile.gettempdir()
+    grapviz_fname = os.path.join(tmp_folder_path,'sublime_text_graphviz_temp.viz')
+    pdf_fname = os.path.join(tmp_folder_path,'sublime_text_graphviz_temp.pdf')
+    
+    # check if graphviz installed
+    has_dot_installed()
+
     # temporary graphviz file
-    grapviz = tempfile.NamedTemporaryFile(prefix='sublime_text_graphviz_', dir=None, suffix='.viz', delete=False, mode='wb')
+    grapviz = open(grapviz_fname,'w+b')
     grapviz.write(code.encode('utf-8'))
     grapviz.close()
 
-    # compile pdf
-    pdf_filename = tempfile.mktemp(prefix='sublime_text_graphviz_', dir=None, suffix='.pdf')
-    call(['dot', '-Tpdf', '-o' + pdf_filename, grapviz.name], env=ENVIRON)
-    os.unlink(grapviz.name)
+    print(grapviz_fname)
 
-    return pdf_filename
+    # compile pdf
+    # 
+    print(">>>> COMPILING PDF")
+    succeeded = check_call(['dot', grapviz_fname, '-Tpdf', '-o', pdf_fname], env=ENVIRON)
+    print("DOTCALL EXIT CODE:",succeeded)
+    print("<<<< COMPILING PDF")
+
+    return pdf_fname, tmp_folder_path

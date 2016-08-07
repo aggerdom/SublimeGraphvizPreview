@@ -2,6 +2,8 @@ import sublime, sublime_plugin
 from subprocess import call
 import os
 import platform
+import shutil
+from time import sleep
 
 try:  # python 3
     from .helpers import surroundingGraphviz, graphvizPDF, ENVIRON
@@ -28,12 +30,15 @@ class GraphvizPreviewCommand(sublime_plugin.TextCommand):
 
         pdf_filename = graphvizPDF(code)
 
+
         try:
+            # sleep(15)
             if platform.system() == 'Windows':
-                os.startfile(pdf_filename)
+                os.startfile(pdf_filename) # open the pdf with its associated program
             else:
                 call(['open', pdf_filename], env=ENVIRON)            
         except Exception as e:
             sublime.error_message('Graphviz: Could not open PDF, ' + str(e))
             raise e
-
+        # finally:
+        #     shutil.rmtree(tmp_folder) # clean up the temporary folder we created
