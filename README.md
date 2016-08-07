@@ -1,48 +1,7 @@
-# GraphvizPreview—SublimeText Plugin
+# Purpose Of This Fork
 
-Simply highlight a graphviz snippet in your file, and hit `super+shift+g` to view it.  You can also click in the the body of a snippet.  Easy!
+This is a fork of the awesome GraphvizPreview pluggin for Sublime. After downloading the pluggin and trying it out on a graphviz snippet, I was having trouble getting it to build the pdf. I originally assumed that the issue was with the way that it was creating temporary files and that the problem was that they were getting cleaned up before they could be opened in my pdf viewer. After going through and reimplementing the logic for how it handled temporary files, I discovered that the problem was actually that I was trying to preview a snippet with syntax errors: embarrasing right?
 
-![Example video of plugin](https://packagecontrol.io/readmes/img/376d256c225f965ec94ee25c42e66c60a98a55a7.gif)
+Anyways I ended up changing the behavior so that rather than creating new temporary files each time the pluggin is called and cleaning them up after the file was closed it would create two persistant files in user's temporary directory and overwrite them each time the pluggin was called. This behavior did however turn out to be preferable in the situation that you're using a pdf viewer, such as SumatraPDF, that doesn't lock pdf files while you're viewing them. Since rather than opening a new tab each time the pluggin is called, it will just update the tab you're previewing the graph in.
 
-## Install
-
-Install the package `GraphvizPreview` through [Package Control](https://packagecontrol.io/packages/GraphvizPreview).  Works with Sublime Text 2 and Sublime Text 3 Beta.
-
-### Install Dependencies
-
-This package also requires `dot` to be installed.
-
-#### MacOS
-
-Install graphviz using [Homebrew](http://brew.sh/)
-
-```
-brew install graphviz
-```
-
-## Installation (Manual)
-
-For windows: 
-* Download and install GraphViz. 
-* Add the GraphViz bin folder to the env PATH variable (C:\Program Files (x86)\Graphviz\bin)
-
-Common: 
-* Download the zip.
-* Rename resulting folder to `GraphvizPreview`.
-* Place the folder in your Sublime Text Packages folder.
-
-## Changelog
-
-### Next release
-
-* Add Windows & Linux Support
-* Configurable hot key
-* Configurable `dot` binary location
-
-### v0.1.1
-
-* Added Sublime Text 3 Support
-
-### v0.1.0
-
-* Created preview plugin for Sublime Text 2 on Mac OS
+If you're interested in trying it out, just download the files in this repo and follow the manual installation instructions found at the [original repo](https://github.com/munro/SublimeGraphvizPreview). 
